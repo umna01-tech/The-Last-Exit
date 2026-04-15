@@ -34,6 +34,6 @@ public:
     void reduceFood (int amount);
     void reduceWater(int amount);
 
-    virtual void update() {}
-    virtual std::string getStatus() const = 0;
+    virtual void update() = 0; // Pure virtual 
+    virtual std::string getStatus() const;
 };
