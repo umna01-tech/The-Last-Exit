@@ -50,3 +50,13 @@ void Entity::reduceWater(int amount) {
     if (water == 0)
         takeDamage(10);
 }
+
+std::string Entity::getStatus() const {
+    if (health <= 0) return "Dead";     
+    if (health < 30) return "Critical"; 
+    if (health < 60) return "Wounded";
+    if (food == 0)   return "Starving";
+    if (water == 0)  return "Dehydrated";
+    return "Healthy";
+}
+
