@@ -1,31 +1,25 @@
 #include "Player.h"
-#include "Inventory.h"
 
 Player::Player(const std::string& name_)
-    : Entity(name_), humanity(START_HUMANITY), damage(MAX_DAMAGE) {} 
+    : Entity(name_), morale(START_MORALE), attack(MIN_ATTACK) {} 
 
 Player::~Player() {}
-
-void Player::takeDamage(int amount) {
-    Entity::takeDamage(amount);
-    // Additional SDL2 logic can be added here
-}
 
 void Player::update() {
     reduceFood(2);
     reduceWater(3);
 }
 
-void Player::addHumanity(int amount) {
-    humanity += amount;
-    if (humanity > MAX_HUMANITY) {
-        humanity = MAX_HUMANITY;
+void Player::addMorale(int amount) {
+    morale += amount;
+    if (morale > MAX_MORALE) {
+        morale = MAX_MORALE;
     }
 }
 
-void Player::reduceHumanity(int amount) {
-    humanity -= amount;
-    if (humanity < 0) {
-        humanity = 0;
+void Player::reduceMorale(int amount) {
+    morale -= amount;
+    if (morale < 0) {
+        morale = 0;
     }
 }
