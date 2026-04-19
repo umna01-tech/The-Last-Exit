@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #pragma once
 #include <string>
 
@@ -37,44 +36,4 @@ public:
 
     virtual void update() = 0; // Pure virtual 
     virtual std::string getStatus() const;
-=======
-#pragma once
-#include <string>
-
-class Entity {
-protected:
-    std::string name;
-    int health;
-    int food;
-    int water;
-
-public:
-    static const int MAX_HEALTH = 100;
-    static const int MAX_FOOD   = 100;
-    static const int MAX_WATER  = 100;
-
-
-    Entity(const std::string& name_);
-    virtual ~Entity();
-
-    // Getters
-    std::string getName() const { return name;   }
-    int getHealth()       const { return health; }
-    int getFood()         const { return food;   }
-    int getWater()        const { return water;  }
-
-    // Status check
-    bool isAlive() const { return health > 0; }
-
-    // Actions
-    virtual void takeDamage(int amount);
-    void heal       (int amount);
-    void addFood    (int amount);
-    void addWater   (int amount);
-    void reduceFood (int amount);
-    void reduceWater(int amount);
-
-    virtual void update() {}
-    virtual std::string getStatus() const = 0;
->>>>>>> 2b3d6b5d000de3f16f0cd0f752883e4b9f8f25e8
 };

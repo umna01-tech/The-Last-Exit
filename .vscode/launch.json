@@ -2,14 +2,28 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Run SFML",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe",
+      "preLaunchTask": "Build SFML"
+    },
+    {
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
       "request": "launch",
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Lenovo/Documents/OOP/Project",
-      "program": "c:/Users/Lenovo/Documents/OOP/Project/build/Debug/outDebug",
+      "cwd": "c:/Users/Lenovo/Documents/OOP/The-Last-Exit",
+      "program": "c:/Users/Lenovo/Documents/OOP/The-Last-Exit/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
