@@ -1,4 +1,4 @@
-#include "Inventory.h"
+#include "Inventory.hpp"
 #include <iostream>
 
 Inventory::Inventory() : food(0), water(0), medicine(0), ammo(0), money(0) {}
@@ -97,4 +97,9 @@ void Inventory::spendMoney(int amount)
         return;
     }
     money -= amount;
+}
+
+void Inventory::setMoney(int amount)
+{
+    money = amount;
 }

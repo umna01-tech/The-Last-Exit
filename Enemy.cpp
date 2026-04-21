@@ -1,7 +1,7 @@
 // Enemy.cpp
-#include "Enemy.h"
-#include "Player.h"
-#include "Inventory.h"
+#include "Enemy.hpp"
+#include "Player.hpp"
+#include "Inventory.hpp"
 #include <cstdlib>
 
 Enemy::Enemy(int health_, int damage_) : health(health_), damage(damage_) {}

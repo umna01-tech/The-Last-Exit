@@ -1,5 +1,5 @@
-#include "Looter.h"
-#include "Inventory.h"
+#include "Looter.hpp"
+#include "Inventory.hpp"
 #include <iostream>
 
 // Constructor

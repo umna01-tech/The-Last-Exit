@@ -7,7 +7,7 @@
       "command": "g++",
       "args": [
         "-g",
-        "${file}",
+        "*.cpp",
         "-o",
         "${fileDirname}/${fileBasenameNoExtension}.exe",
         "-I", "C:/msys64/ucrt64/include",

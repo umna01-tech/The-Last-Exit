@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Entity.h"
+#include "Entity.hpp"
 
 class Inventory
 {
@@ -45,4 +45,5 @@ public:
 
     void addMoney(int amount);
     void spendMoney(int amount);
+    void setMoney(int amount);
 };

@@ -1,7 +1,7 @@
-#include "Player.h"
+#include "Player.hpp"
 
 Player::Player(const std::string& name_)
-    : Entity(name_), morale(START_MORALE), attack(MIN_ATTACK) {} 
+    : Entity(name_), morale(START_MORALE), attack(MIN_ATTACK) {}
 
 Player::~Player() {}
 
@@ -12,14 +12,16 @@ void Player::update() {
 
 void Player::addMorale(int amount) {
     morale += amount;
-    if (morale > MAX_MORALE) {
-        morale = MAX_MORALE;
-    }
+    if (morale > MAX_MORALE) morale = MAX_MORALE;
 }
 
 void Player::reduceMorale(int amount) {
     morale -= amount;
-    if (morale < 0) {
-        morale = 0;
-    }
+    if (morale < 0) morale = 0;
+}
+
+std::string Player::getStatus() const {
+    if (health < 30) return "Wounded";
+    if (health < 60) return "Energy getting low";
+    return "healthy";
 }

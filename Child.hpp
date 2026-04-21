@@ -1,11 +1,12 @@
 #pragma once
-#include "FamilyMember.h"
-
+#include "FamilyMember.hpp"
+ 
 class Child : public FamilyMember {
 private:
     int moraleTimer;
-
+ 
 public:
     Child(const std::string& name_, Player& player_);
     void update() override;
+    std::string getStatus() const override;
 };

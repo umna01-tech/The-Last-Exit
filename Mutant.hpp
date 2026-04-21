@@ -1,5 +1,5 @@
 #pragma once
-#include "Enemy.h"
+#include "Enemy.hpp"
 #include <string>
 
 class Mutant : public Enemy

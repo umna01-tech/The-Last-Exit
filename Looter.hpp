@@ -1,5 +1,5 @@
 #pragma once
-#include "Enemy.h"
+#include "Enemy.hpp"
 
 class Looter : public Enemy {
 public:
