@@ -11,7 +11,7 @@ enum class GameState {
     UNDERGROUND,
     GAME_OVER
 };
-
+ 
 enum class Difficulty {
     EASY,
     MEDIUM,
@@ -128,9 +128,7 @@ int main() {
             window.draw(medBtn);
             window.draw(hardBtn);
 
-            sf::Text moneyText(font,
-                "Money: " + std::to_string(inventory.getMoney()),
-                20);
+            sf::Text moneyText(font, "Money: " + std::to_string(inventory.getMoney()), 20);
             moneyText.setPosition({50.f, 50.f});
             window.draw(moneyText);
         }
