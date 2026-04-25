@@ -4,9 +4,6 @@
 #include <string>
 #include <optional>
 
-// ─────────────────────────────────────────────
-//  Enums
-// ─────────────────────────────────────────────
 enum class GameState {
     MAIN_MENU,
     DIFFICULTY,
@@ -23,40 +20,29 @@ enum class Difficulty {
     HARD
 };
 
-// ─────────────────────────────────────────────
-//  Helpers
-// ─────────────────────────────────────────────
 void applyDifficulty(Difficulty diff, Inventory& inventory) {
-    if      (diff == Difficulty::EASY)   inventory.setMoney(1000);
-    else if (diff == Difficulty::MEDIUM) inventory.setMoney(500);
-    else                                 inventory.setMoney(250);
+    if      
+        (diff == Difficulty::EASY)   inventory.setMoney(1000);
+    else if 
+        (diff == Difficulty::MEDIUM) inventory.setMoney(500);
+    else                                 
+        inventory.setMoney(250);
 }
 
-// ─────────────────────────────────────────────
-//  Main
-// ─────────────────────────────────────────────
 int main() {
-    sf::RenderWindow window(
-        sf::VideoMode({1280u, 720u}),
-        "Survival Underground",
-        sf::State::Windowed
-    );
+    sf::RenderWindow window( sf::VideoMode({1280u, 720u}),"Survival Underground", sf::State::Windowed );
     window.setFramerateLimit(60);
 
-    // ── State ─────────────────────────────────
     GameState  state      = GameState::MAIN_MENU;
     Difficulty difficulty = Difficulty::MEDIUM;
     Inventory  inventory;
 
-    // ── Font ──────────────────────────────────
     sf::Font font;
     if (!font.openFromFile("assets\\fonts\\arial.ttf"))
         return -1;
 
-    // ── Store ─────────────────────────────────
     Store store(font);
 
-    // ── Difficulty buttons ────────────────────
     sf::RectangleShape easyBtn({200.f, 60.f});
     easyBtn.setPosition({540.f, 250.f});
     easyBtn.setFillColor(sf::Color::Green);
@@ -69,7 +55,6 @@ int main() {
     hardBtn.setPosition({540.f, 450.f});
     hardBtn.setFillColor(sf::Color::Red);
 
-    // ── Cutscene 1 texture / sprite ───────────
     sf::Texture cutscene1Tex;
     std::optional<sf::Sprite> cutscene1Sprite;
 
@@ -88,9 +73,7 @@ int main() {
 
     sf::Clock clock;
 
-    // ─────────────────────────────────────────
     //  Game loop
-    // ─────────────────────────────────────────
     while (window.isOpen()) {
 
         // ── Events ────────────────────────────
@@ -109,9 +92,7 @@ int main() {
             else if (state == GameState::DIFFICULTY) {
                 if (const auto* mouse = event->getIf<sf::Event::MouseButtonPressed>()) {
                     if (mouse->button == sf::Mouse::Button::Left) {
-                        sf::Vector2f mpos = window.mapPixelToCoords(
-                            sf::Mouse::getPosition(window)
-                        );
+                        sf::Vector2f mpos = window.mapPixelToCoords( sf::Mouse::getPosition(window));
                         if (easyBtn.getGlobalBounds().contains(mpos)) {
                             difficulty = Difficulty::EASY;
                             applyDifficulty(difficulty, inventory);
@@ -156,8 +137,7 @@ int main() {
                         state = GameState::MAIN_MENU;
             }
         }
-
-        // ── Update ────────────────────────────
+        
         float dt = clock.restart().asSeconds();
         (void)dt;
 

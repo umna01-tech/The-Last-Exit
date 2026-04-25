@@ -1,88 +1,102 @@
 #include "Inventory.hpp"
+#include <algorithm>
 #include <iostream>
 
-Inventory::Inventory() : food(0), water(0), medicine(0), ammo(0), money(0) {}
+Inventory::Inventory()
+    : food(0), water(0), medicine(0), ammo(0), money(0)
+{}
 
-bool Inventory::hasFood() const { return food > 0; }
-bool Inventory::hasWater() const { return water > 0; }
-bool Inventory::hasMed() const { return medicine > 0; }
-bool Inventory::hasAmmo() const { return ammo > 0; }
-bool Inventory::canAfford(int price) const { return money >= price; }
+// ─── Helper ───────────────────────────────────────────────────────────────────
+
+int Inventory::clamp(int value, int lo, int hi)
+{
+    return std::max(lo, std::min(value, hi));
+}
+
+// ─── Queries ──────────────────────────────────────────────────────────────────
+
+bool Inventory::hasFood()            const { return food     > 0; }
+bool Inventory::hasWater()           const { return water    > 0; }
+bool Inventory::hasMed()             const { return medicine > 0; }
+bool Inventory::hasAmmo()            const { return ammo     > 0; }
+bool Inventory::canAfford(int price) const { return money   >= price; }
+
+// ─── Food ─────────────────────────────────────────────────────────────────────
 
 void Inventory::addFood(int amount)
 {
-    food += amount;
-    if (food > MAX_FOOD)
-        food = MAX_FOOD;
-}
-
-void Inventory::useFood(Entity& entity)
-{
-    if (!hasFood())
-    {
-        std::cout << "No food left.\n";
-        return;
-    }
-    food -= 1;
-    entity.addFood(5);
+    food = clamp(food + amount, 0, MAX_FOOD);
 }
 
 void Inventory::removeFood(int amount)
 {
-    food -= amount;
-    if (food < 0)
-        food = 0;
+    food = clamp(food - amount, 0, MAX_FOOD);
 }
+
+void Inventory::useFood(Entity& entity)
+{
+    if (!hasFood()) { std::cout << "No food left.\n"; return; }
+    food--;
+    entity.addFood(5);
+}
+
+// ─── Water ────────────────────────────────────────────────────────────────────
 
 void Inventory::addWater(int amount)
 {
-    water += amount;
-    if (water > MAX_WATER)
-        water = MAX_WATER;
-}
-
-void Inventory::useWater(Entity& entity)
-{
-    if (!hasWater())
-    {
-        std::cout << "No water left.\n";
-        return;
-    }
-    water -= 1;
-    entity.addWater(5);
+    water = clamp(water + amount, 0, MAX_WATER);
 }
 
 void Inventory::removeWater(int amount)
 {
-    water -= amount;
-    if (water < 0)
-        water = 0;
+    water = clamp(water - amount, 0, MAX_WATER);
 }
 
-void Inventory::addMedicine(int amount) { medicine += amount; }
-
-void Inventory::useMedicine(Entity &entity)
+void Inventory::useWater(Entity& entity)
 {
-    if (!hasMed())
-    {
-        std::cout << "No medicine left.\n";
-        return;
-    }
-    medicine -= 1;
+    if (!hasWater()) { std::cout << "No water left.\n"; return; }
+    water--;
+    entity.addWater(5);
+}
+
+// ─── Medicine ─────────────────────────────────────────────────────────────────
+
+void Inventory::addMedicine(int amount)
+{
+    medicine = clamp(medicine + amount, 0, MAX_MEDICINE);
+}
+
+void Inventory::removeMedicine(int amount)
+{
+    medicine = clamp(medicine - amount, 0, MAX_MEDICINE);
+}
+
+void Inventory::useMedicine(Entity& entity)
+{
+    if (!hasMed()) { std::cout << "No medicine left.\n"; return; }
+    medicine--;
     entity.heal(15);
 }
 
-void Inventory::addAmmo(int amount) { ammo += amount; }
+// ─── Ammo ─────────────────────────────────────────────────────────────────────
+
+void Inventory::addAmmo(int amount)
+{
+    ammo = clamp(ammo + amount, 0, MAX_AMMO);
+}
+
+void Inventory::removeAmmo(int amount)
+{
+    ammo = clamp(ammo - amount, 0, MAX_AMMO);
+}
 
 void Inventory::useAmmo()
 {
-    if (!hasAmmo())
-    {
-        std::cout << "No ammo left.\n";
-        return;
-    }
-    ammo -= 1;
+    if (!hasAmmo()) { std::cout << "No ammo left.\n"; return; }
+    ammo--;
 }
+
+// ─── Money ────────────────────────────────────────────────────────────────────
 
 void Inventory::addMoney(int amount)
 {
@@ -91,11 +105,7 @@ void Inventory::addMoney(int amount)
 
 void Inventory::spendMoney(int amount)
 {
-    if (!canAfford(amount))
-    {
-        std::cout << "Not enough money.\n";
-        return;
-    }
+    if (!canAfford(amount)) { std::cout << "Not enough money.\n"; return; }
     money -= amount;
 }
 
