@@ -14,13 +14,15 @@ void Entity::takeDamage(int amount) {
 void Entity::heal(int amount) {
     if (!isAlive()) return;
     health += amount;
-    if (health > MAX_HEALTH) health = MAX_HEALTH;
+    if (health > MAX_HEALTH) 
+        health = MAX_HEALTH;
 }
 
 void Entity::addFood(int amount) {
     if (!isAlive()) return;
     food += amount;
-    if (food > MAX_FOOD) food = MAX_FOOD;
+    if (food > MAX_FOOD) 
+        food = MAX_FOOD;
 }
 
 void Entity::addWater(int amount) {
@@ -39,6 +41,9 @@ void Entity::reduceFood(int amount) {
 void Entity::reduceWater(int amount) {
     if (!isAlive()) return;
     water -= amount;
-    if (water < 0) water = 0;
-    if (water == 0) takeDamage(10);
+    if (water < 0) 
+        water = 0;
+    if (water == 0) 
+        takeDamage(10);
 }
+//DONE

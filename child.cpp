@@ -9,13 +9,7 @@ void Child::update() {
     FamilyMember::update();
     moraleTimer++;
     if (moraleTimer >= 5) {
-        player.addFood(10);
+        player.addMorale(5);
         moraleTimer = 0;
     }
-}
-
-std::string Child::getStatus() const {
-    if (health > 70) return "Playful";
-    if (health > 30) return "Scared";
-    return "Needs care";
 }

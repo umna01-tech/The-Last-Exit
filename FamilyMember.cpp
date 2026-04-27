@@ -9,12 +9,13 @@ FamilyMember::~FamilyMember() {}
 void FamilyMember::takeDamage(int amount) {
     if (!isAlive()) return;
     health -= amount;
-    if (health < 0) health = 0;
+    if (health < 0) 
+        health = 0;
 }
 
 void FamilyMember::update() {
-    reduceFood(2);
-    reduceWater(3);
+    reduceFood(10);
+    reduceWater(15);
 }
 
 std::string FamilyMember::getStatus() const {

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
@@ -7,9 +6,9 @@
 
 struct StoreItem {
     std::string name;
-    int         priceEach;
-    int         maxPerBuy;
-    int         quantity;   // units currently held in inventory (starts at 0)
+    int priceEach;
+    int maxPerBuy;
+    int quantity; 
     enum class Type { FOOD, WATER, MEDICINE, AMMO } type;
 };
 
@@ -21,7 +20,7 @@ public:
     void handleEvent(const sf::Event& event, sf::RenderWindow& window, Inventory& inventory);
 
     bool isDone() const { return done; }
-    void reset()        { done = false; }
+    void reset()  { done = false; }
 
 private:
     sf::Font& font;
@@ -47,6 +46,5 @@ private:
     void addOne(int index, Inventory& inventory);
     void removeOne(int index, Inventory& inventory);
 
-    sf::Text makeText(const std::string& str, unsigned size,
-                      sf::Color colour = sf::Color::White);
+    sf::Text makeText(const std::string& str, unsigned size, sf::Color colour = sf::Color::White);
 };

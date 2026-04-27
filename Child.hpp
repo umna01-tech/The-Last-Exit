@@ -8,5 +8,4 @@ private:
 public:
     Child(const std::string& name_, Player& player_);
     void update() override;
-    std::string getStatus() const override;
 };

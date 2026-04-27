@@ -1,17 +1,14 @@
 #include "Store.hpp"
 
-// ─── Constructor ──────────────────────────────────────────────────────────────
-
+//name, priceEach, maxPerBuy, quantity, type
 Store::Store(sf::Font& font) : font(font)
 {
-    // quantity starts at 0 — tracks how many the player has added live
     items = {
-        { "Food",     20, 10, 0, StoreItem::Type::FOOD     },
-        { "Water",    15, 10, 0, StoreItem::Type::WATER    },
-        { "Medicine", 50,  5, 0, StoreItem::Type::MEDICINE },
-        { "Ammo",     10, 20, 0, StoreItem::Type::AMMO     },
+        { "Food",    25, 25, 0, StoreItem::Type::FOOD    },
+        { "Water",   20, 25, 0, StoreItem::Type::WATER   },
+        { "Medicine",50, 10,  0, StoreItem::Type::MEDICINE},
+        { "Ammo",    30, 30, 0, StoreItem::Type::AMMO    },
     };
-
     buildRows();
 
     leaveBtn.setSize({200.f, 50.f});
@@ -19,7 +16,7 @@ Store::Store(sf::Font& font) : font(font)
     leaveBtn.setFillColor(sf::Color(160, 40, 40));
 }
 
-// ─── buildRows ────────────────────────────────────────────────────────────────
+// buildRows
 
 void Store::buildRows()
 {
@@ -67,32 +64,42 @@ void Store::handleEvent(const sf::Event& event, sf::RenderWindow& window, Invent
 
 void Store::addOne(int i, Inventory& inventory)
 {
-    if (items[i].quantity >= items[i].maxPerBuy)       return; // at max
-    if (!inventory.canAfford(items[i].priceEach))      return; // broke
+    if (items[i].quantity >= items[i].maxPerBuy)       
+        return;
+    if (!inventory.canAfford(items[i].priceEach))      
+        return; 
 
     inventory.spendMoney(items[i].priceEach);
     items[i].quantity++;
 
     switch (items[i].type) {
-        case StoreItem::Type::FOOD:     inventory.addFood(1);     break;
-        case StoreItem::Type::WATER:    inventory.addWater(1);    break;
-        case StoreItem::Type::MEDICINE: inventory.addMedicine(1); break;
-        case StoreItem::Type::AMMO:     inventory.addAmmo(1);     break;
+        case StoreItem::Type::FOOD:    inventory.addFood(1);     
+            break;
+        case StoreItem::Type::WATER:   inventory.addWater(1);    
+            break;
+        case StoreItem::Type::MEDICINE:inventory.addMedicine(1); 
+            break;
+        case StoreItem::Type::AMMO:    inventory.addAmmo(1);       
+            break;
     }
 }
 
 void Store::removeOne(int i, Inventory& inventory)
 {
-    if (items[i].quantity <= 0) return; // nothing to refund
+    if (items[i].quantity <= 0) return;
 
     inventory.addMoney(items[i].priceEach);
     items[i].quantity--;
 
     switch (items[i].type) {
-        case StoreItem::Type::FOOD:     inventory.removeFood(1);     break;
-        case StoreItem::Type::WATER:    inventory.removeWater(1);    break;
-        case StoreItem::Type::MEDICINE: inventory.removeMedicine(1); break;
-        case StoreItem::Type::AMMO:     inventory.removeAmmo(1);     break;
+        case StoreItem::Type::FOOD:     inventory.removeFood(1);        
+            break;
+        case StoreItem::Type::WATER:    inventory.removeWater(1);      
+            break;
+        case StoreItem::Type::MEDICINE: inventory.removeMedicine(1); 
+            break;
+        case StoreItem::Type::AMMO:     inventory.removeAmmo(1);     
+            break;
     }
 }
 
@@ -200,14 +207,14 @@ void Store::draw(sf::RenderWindow& window, const Inventory& inventory)
     // ── Inventory summary ─────────────────────
     float summaryY = START_Y + items.size() * ROW_H + 20.f;
 
-    auto summaryTitle = makeText("YOUR INVENTORY", 20, sf::Color(150, 150, 150));
+    auto summaryTitle = makeText("YOUR INVENTORY", 30, sf::Color(150, 150, 150));
     summaryTitle.setPosition({LEFT_X, summaryY});
     window.draw(summaryTitle);
 
-    auto foodTxt  = makeText("Food: "     + std::to_string(inventory.getFood()),     18, sf::Color(200, 200, 200));
-    auto waterTxt = makeText("Water: "    + std::to_string(inventory.getWater()),    18, sf::Color(200, 200, 200));
-    auto medTxt   = makeText("Medicine: " + std::to_string(inventory.getMedicine()), 18, sf::Color(200, 200, 200));
-    auto ammoTxt  = makeText("Ammo: "     + std::to_string(inventory.getAmmo()),     18, sf::Color(200, 200, 200));
+    auto foodTxt  = makeText("Food: "     + std::to_string(inventory.getFood()),     26, sf::Color(200, 200, 200));
+    auto waterTxt = makeText("Water: "    + std::to_string(inventory.getWater()),    26, sf::Color(200, 200, 200));
+    auto medTxt   = makeText("Medicine: " + std::to_string(inventory.getMedicine()), 26, sf::Color(200, 200, 200));
+    auto ammoTxt  = makeText("Ammo: "     + std::to_string(inventory.getAmmo()),     26, sf::Color(200, 200, 200));
 
     foodTxt .setPosition({LEFT_X,          summaryY + 28.f}); window.draw(foodTxt);
     waterTxt.setPosition({LEFT_X + 160.f,  summaryY + 28.f}); window.draw(waterTxt);

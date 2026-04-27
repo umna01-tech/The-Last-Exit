@@ -2,13 +2,7 @@
 #include "Inventory.hpp"
 #include <iostream>
 
-// Constructor
 Looter::Looter(int health, int damage) : Enemy(health, damage){}
-
-void Looter::takeDamage(int amount) {}
-void Looter::attack(Player& player) {}
-void Looter::onDeath(Inventory& inventory) {}
-
 // Steal resources
 void Looter::stealResources(Inventory& Inventory) {
     int choice = rand() % 2;

@@ -1,4 +1,3 @@
-// Enemy.cpp
 #include "Enemy.hpp"
 #include "Player.hpp"
 #include "Inventory.hpp"
@@ -10,7 +9,8 @@ Enemy::~Enemy() {}
 
 void Enemy::takeDamage(int amount) {
     health -= amount;
-    if (health < 0) health = 0;
+    if (health < 0) 
+        health = 0;
 }
 
 std::string Enemy::getStatus() const {

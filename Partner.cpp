@@ -21,9 +21,3 @@ void Partner::update() {
     }
 }
  
-std::string Partner::getStatus() const {
-    if (health > 70) return "Supportive";
-    if (health > 30) return "Struggling";
-    return "Needs help";
-}
- 

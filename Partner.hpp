@@ -11,5 +11,4 @@ public:
  
     void healPlayer();
     void update() override;
-    std::string getStatus() const override;
 };
