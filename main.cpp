@@ -38,7 +38,7 @@ struct GameSession {
     std::unique_ptr<GameWorld> world;
     std::unique_ptr<HUD>       hud;
 
-    GameSession() : player(""), partner("", "", player), child("", player) {}
+    GameSession() : player(""), child("", player), partner("", "", player, child) {}
 };
 
 int main() {
@@ -342,16 +342,6 @@ int main() {
         title.setPosition({640.f, 160.f});
     }
     window.draw(title);
- 
-    // Subtitle (ending name)
-    sf::Text sub(font, card.subtitle, 18);
-    sub.setFillColor(sf::Color(130, 130, 130));
-    {
-        sf::FloatRect b = sub.getLocalBounds();
-        sub.setOrigin({b.size.x / 2.f, 0.f});
-        sub.setPosition({640.f, 220.f});
-    }
-    window.draw(sub);
  
     // Divider
     sf::RectangleShape div({400.f, 1.f});

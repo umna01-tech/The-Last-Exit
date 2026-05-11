@@ -504,16 +504,6 @@ void HUD::drawEndingScreen(sf::RenderWindow& window) {
     }
     window.draw(title);
 
-    // Subtitle
-    sf::Text sub(font, card.subtitle, 18);
-    sub.setFillColor(sf::Color(130, 130, 130));
-    {
-        sf::FloatRect b = sub.getLocalBounds();
-        sub.setOrigin({b.size.x / 2.f, 0.f});
-        sub.setPosition({640.f, 220.f});
-    }
-    window.draw(sub);
-
     // Divider
     sf::RectangleShape div({400.f, 1.f});
     div.setFillColor(sf::Color(60, 60, 70));
