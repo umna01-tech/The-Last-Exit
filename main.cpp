@@ -5,10 +5,12 @@
 #include "Partner.hpp"
 #include "Child.hpp"
 #include "GameWorld.hpp"
+#include "Endings.hpp"
 #include "HUD.hpp"
 #include <string>
 #include <optional>
 #include <memory>
+#include <sstream>
 
 enum class GameState {
     MAIN_MENU,
@@ -305,11 +307,85 @@ int main() {
         }
 
         else if (state == GameState::GAME_OVER) {
-            drawCentered("YOU DID NOT MAKE IT",          52, sf::Color(200,40,40),  240.f, true);
-            drawCentered("The tunnels took everything.", 24, sf::Color(160,160,160), 340.f);
-            drawCentered("Click to try again.",          18, sf::Color(100,100,100), 430.f);
+ 
+    EndingType  et   = session->world
+                           ? session->world->getEnding()
+                           : EndingType::DEAD_COLLAPSE;
+    EndingCard  card = getEndingCard(et);
+ 
+    // Title
+    sf::Text title(font, card.title, 44);
+    title.setStyle(sf::Text::Bold);
+ 
+    // Pick title colour by ending family
+    sf::Color titleCol;
+    switch (et) {
+        case EndingType::ESCAPE_WHOLE:
+            titleCol = sf::Color(100, 220, 120); break;   // green
+        case EndingType::ESCAPE_SCARRED:
+        case EndingType::ESCAPE_HOLLOW:
+            titleCol = sf::Color(220, 200, 100); break;   // amber
+        case EndingType::ESCAPE_BROKEN:
+        case EndingType::ESCAPE_LAST_THING:
+            titleCol = sf::Color(200, 140, 80);  break;   // orange
+        case EndingType::ESCAPE_ALONE:
+            titleCol = sf::Color(180, 100, 60);  break;   // dark orange
+        case EndingType::DEAD_COLLAPSE:
+        case EndingType::DEAD_GAVE_UP:
+        default:
+            titleCol = sf::Color(200, 40, 40);   break;   // red
+    }
+    title.setFillColor(titleCol);
+    {
+        sf::FloatRect b = title.getLocalBounds();
+        title.setOrigin({b.size.x / 2.f, 0.f});
+        title.setPosition({640.f, 160.f});
+    }
+    window.draw(title);
+ 
+    // Subtitle (ending name)
+    sf::Text sub(font, card.subtitle, 18);
+    sub.setFillColor(sf::Color(130, 130, 130));
+    {
+        sf::FloatRect b = sub.getLocalBounds();
+        sub.setOrigin({b.size.x / 2.f, 0.f});
+        sub.setPosition({640.f, 220.f});
+    }
+    window.draw(sub);
+ 
+    // Divider
+    sf::RectangleShape div({400.f, 1.f});
+    div.setFillColor(sf::Color(60, 60, 70));
+    div.setPosition({240.f, 258.f});
+    window.draw(div);
+ 
+    // Flavour body — draw each line separately for clean centering
+    {
+        std::string line;
+        float lineY = 272.f;
+        const float lineH = 32.f;
+        std::istringstream ss(card.body);
+        while (std::getline(ss, line)) {
+            sf::Text lt(font, line, 19);
+            lt.setFillColor(sf::Color(190, 185, 170));
+            sf::FloatRect b = lt.getLocalBounds();
+            lt.setOrigin({b.size.x / 2.f, 0.f});
+            lt.setPosition({640.f, lineY});
+            window.draw(lt);
+            lineY += lineH;
         }
-
+    }
+ 
+    // Prompt
+    sf::Text prompt(font, "[ click to play again ]", 15);
+    prompt.setFillColor(sf::Color(90, 90, 90));
+    {
+        sf::FloatRect b = prompt.getLocalBounds();
+        prompt.setOrigin({b.size.x / 2.f, 0.f});
+        prompt.setPosition({640.f, 640.f});
+    }
+    window.draw(prompt);
+}
         // Fade overlay
         if (fadeAlpha > 0.f) {
             sf::RectangleShape fr({1280.f, 720.f});

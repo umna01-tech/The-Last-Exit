@@ -18,6 +18,7 @@ public:
     std::string getStatus() const override;
 
     void addMorale(int amount);
+    void setMorale(int amount);
     void reduceMorale(int amount);
     int getMorale() const { return morale; }
     int getAttack() const { return attack; }

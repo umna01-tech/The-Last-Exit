@@ -6,12 +6,14 @@
 #include "GameWorld.hpp"
 #include "Enemy.hpp"
 #include "Entity.hpp"
+#include "Endings.hpp"
+#include <sstream>
 #include <cmath>
 
 HUD::HUD(sf::Font& font, Player& player, Partner& partner, Child& child, Inventory& inventory, GameWorld& world)
-    : font(font), player(player), partner(partner), child(child) , inventory(inventory), world(world)
+    : font(font), player(player), partner(partner), child(child), inventory(inventory), world(world)
 {
-    // Combat 
+    // Combat buttons
     float cbx = INV_W + CENTER_W * 0.5f - 110.f;
     float cby = H - 68.f;
     attackAmmoBtn.setSize({100.f, 38.f});
@@ -22,7 +24,7 @@ HUD::HUD(sf::Font& font, Player& player, Partner& partner, Child& child, Invento
     attackHandBtn.setPosition({cbx + 118.f, cby});
     attackHandBtn.setFillColor(sf::Color(80, 60, 20));
 
-    // Rest button — bottom of inventory panel
+    // Rest button
     restBtn.setSize({INV_W - 16.f, 36.f});
     restBtn.setPosition({8.f, H - 44.f});
     restBtn.setFillColor(sf::Color(28, 50, 28));
@@ -31,10 +33,9 @@ HUD::HUD(sf::Font& font, Player& player, Partner& partner, Child& child, Invento
 }
 
 void HUD::draw(sf::RenderWindow& window) {
-    //If gameOver just draw ending screen and return
-    if (world.isFinished()) { 
-        drawEndingScreen(window); 
-        return; 
+    if (world.isFinished()) {
+        drawEndingScreen(window);
+        return;
     }
 
     dropZones.clear();
@@ -45,14 +46,11 @@ void HUD::draw(sf::RenderWindow& window) {
     drawCenterPanel(window);
     drawStatsPanel(window);
 
-    if (world.inCombat()) 
-    {
+    if (world.isCombatActive())
         drawCombatOverlay(window);
-    }
-    if (drag.active) 
-    {
+
+    if (drag.active)
         drawDraggedItem(window);
-    }
 }
 
 void HUD::drawTopBar(sf::RenderWindow& window) {
@@ -93,11 +91,10 @@ void HUD::drawInventoryPanel(sf::RenderWindow& window) {
         {"Ammo",     inventory.getAmmo(),     sf::Color(210, 80,  80)},
     };
 
-    float iy = TOP_H + 36.f;
-    float iconR = 24.f; // icon radius
+    float iy     = TOP_H + 36.f;
+    float iconR  = 24.f;
 
     for (auto& row : rows) {
-        // Section background
         sf::RectangleShape rowBg({INV_W - 8.f, 70.f});
         rowBg.setPosition({4.f, iy});
         rowBg.setFillColor(sf::Color(16, 18, 28));
@@ -105,14 +102,12 @@ void HUD::drawInventoryPanel(sf::RenderWindow& window) {
         rowBg.setOutlineThickness(1.f);
         window.draw(rowBg);
 
-        // Icon (drawn as colored shape — acts as drag handle)
         sf::Vector2f iconCenter = {4.f + iconR + 4.f, iy + 35.f};
         drawItemIcon(window, row.name, iconCenter, iconR);
 
-        // Register as draggable
         if (row.name != "Ammo") {
             InvIcon ic;
-            ic.rect = sf::FloatRect({iconCenter.x - iconR, iconCenter.y - iconR}, {iconR*2.f, iconR*2.f});
+            ic.rect     = sf::FloatRect({iconCenter.x - iconR, iconCenter.y - iconR}, {iconR*2.f, iconR*2.f});
             ic.itemName = row.name;
             invIcons.push_back(ic);
         }
@@ -121,12 +116,10 @@ void HUD::drawInventoryPanel(sf::RenderWindow& window) {
         countT.setPosition({4.f + iconR*2 + 12.f, iy + 10.f});
         window.draw(countT);
 
-        // Item name
         auto nameT = makeText(row.name, 12, sf::Color(160, 160, 180));
         nameT.setPosition({4.f + iconR*2 + 12.f, iy + 30.f});
         window.draw(nameT);
 
-        // Ammo note
         if (row.name == "Ammo") {
             auto ammoNote = makeText("player only\nNot draggable", 10, sf::Color(100, 100, 120));
             ammoNote.setPosition({4.f + iconR*2 + 12.f, iy + 48.f});
@@ -136,7 +129,6 @@ void HUD::drawInventoryPanel(sf::RenderWindow& window) {
         iy += 76.f;
     }
 
-    // ── REST button ───────────────────────────────────────────────────────────
     bool canRest = (inventory.getFood() >= 9 && inventory.getWater() >= 9);
     restBtn.setFillColor(canRest ? sf::Color(22, 48, 22) : sf::Color(22, 28, 22));
     restBtn.setOutlineColor(canRest ? sf::Color(50, 130, 50) : sf::Color(40, 55, 40));
@@ -147,8 +139,6 @@ void HUD::drawInventoryPanel(sf::RenderWindow& window) {
     restL.setPosition({12.f, H - 37.f});
     window.draw(restL);
 }
-
-// ─── Center panel ─────────────────────────────────────────────────────────────
 
 void HUD::drawCenterPanel(sf::RenderWindow& window) {
     sf::RectangleShape bg({CENTER_W, CENTER_H});
@@ -162,11 +152,9 @@ void HUD::drawCenterPanel(sf::RenderWindow& window) {
                {CENTER_W - 8.f, CENTER_H - 8.f});
 }
 
-// ─── Stats panel ──────────────────────────────────────────────────────────────
-
 void HUD::drawStatsPanel(sf::RenderWindow& window) {
-    float px = INV_W + CENTER_W;
-    float py = TOP_H;
+    float px   = INV_W + CENTER_W;
+    float py   = TOP_H;
     float barW = STATS_W - 22.f;
 
     sf::RectangleShape bg({STATS_W, CENTER_H});
@@ -178,7 +166,6 @@ void HUD::drawStatsPanel(sf::RenderWindow& window) {
 
     float y = py + 8.f;
 
-    // Helper: draw one character's stats block + drop zone
     auto drawCharBlock = [&](const std::string& label, int hp, int food, int water,
                               bool alive, sf::Color nameCol,
                               const std::string& targetKey, float blockH,
@@ -190,13 +177,11 @@ void HUD::drawStatsPanel(sf::RenderWindow& window) {
         block.setOutlineThickness(1.f);
         window.draw(block);
 
-        // Register as drop zone
         DropZone dz;
         dz.rect   = block.getGlobalBounds();
         dz.target = targetKey;
         dropZones.push_back(dz);
 
-        // Highlight if dragging over
         if (drag.active && block.getGlobalBounds().contains(drag.pos)) {
             sf::RectangleShape hl({STATS_W - 6.f, blockH});
             hl.setPosition({px + 3.f, y});
@@ -212,7 +197,7 @@ void HUD::drawStatsPanel(sf::RenderWindow& window) {
         window.draw(nm);
         y += 22.f;
 
-        drawStatBar(window, "HP", (float)hp, (float)Entity::MAX_HEALTH, {px+8.f,y}, barW, sf::Color(200,60,60)); y+=17.f;
+        drawStatBar(window, "HP", (float)hp, (float)Entity::MAX_HEALTH, {px+8.f,y}, barW, sf::Color(200,60,60)); y += 17.f;
 
         sf::Color statusCol = (status == "Critical") ? sf::Color(220,60,60) :
                               (status == "Tired")    ? sf::Color(220,180,60) :
@@ -222,24 +207,21 @@ void HUD::drawStatsPanel(sf::RenderWindow& window) {
         window.draw(statusT);
         y += 12.f;
 
-        drawStatBar(window, "Food",  (float)food,  (float)Entity::MAX_FOOD,   {px+8.f,y}, barW, sf::Color(200,160,60)); y+=17.f;
-        drawStatBar(window, "Water", (float)water, (float)Entity::MAX_WATER,  {px+8.f,y}, barW, sf::Color(60,140,220)); y+=17.f;
+        drawStatBar(window, "Food",  (float)food,  (float)Entity::MAX_FOOD,  {px+8.f,y}, barW, sf::Color(200,160,60)); y += 17.f;
+        drawStatBar(window, "Water", (float)water, (float)Entity::MAX_WATER, {px+8.f,y}, barW, sf::Color(60,140,220)); y += 17.f;
         y += 6.f;
     };
 
-    // Child
     drawCharBlock("COMPANION (young)",
                   child.getHealth(), child.getFood(), child.getWater(),
                   child.isAlive(), sf::Color(180, 220, 255), "child", 100.f,
                   child.getStatus());
 
-    // Partner
     drawCharBlock("COMPANION",
                   partner.getHealth(), partner.getFood(), partner.getWater(),
                   partner.isAlive(), sf::Color(220, 180, 255), "partner", 100.f,
                   partner.getStatus());
 
-    // Player block
     float playerBlockH = 124.f;
     sf::RectangleShape playerBlock({STATS_W - 6.f, playerBlockH});
     playerBlock.setPosition({px + 3.f, y});
@@ -266,7 +248,7 @@ void HUD::drawStatsPanel(sf::RenderWindow& window) {
     window.draw(pnm);
     y += 22.f;
 
-    drawStatBar(window, "HP",    (float)player.getHealth(), (float)Entity::MAX_HEALTH, {px+8.f,y}, barW, sf::Color(200,60,60));  y+=17.f;
+    drawStatBar(window, "HP",    (float)player.getHealth(), (float)Entity::MAX_HEALTH, {px+8.f,y}, barW, sf::Color(200,60,60));  y += 17.f;
 
     sf::Color psCol = (player.getStatus() == "Critical") ? sf::Color(220,60,60) :
                       (player.getStatus() == "Tired")    ? sf::Color(220,180,60) :
@@ -276,20 +258,18 @@ void HUD::drawStatsPanel(sf::RenderWindow& window) {
     window.draw(psT);
     y += 12.f;
 
-    drawStatBar(window, "Food",   (float)player.getFood(),   (float)Entity::MAX_FOOD,   {px+8.f,y}, barW, sf::Color(200,160,60)); y+=17.f;
-    drawStatBar(window, "Water",  (float)player.getWater(),  (float)Entity::MAX_WATER,  {px+8.f,y}, barW, sf::Color(60,140,220)); y+=17.f;
-    drawStatBar(window, "Morale", (float)player.getMorale(), (float)Player::MAX_MORALE, {px+8.f,y}, barW, sf::Color(160,80,200)); y+=17.f;
+    drawStatBar(window, "Food",   (float)player.getFood(),   (float)Entity::MAX_FOOD,   {px+8.f,y}, barW, sf::Color(200,160,60)); y += 17.f;
+    drawStatBar(window, "Water",  (float)player.getWater(),  (float)Entity::MAX_WATER,  {px+8.f,y}, barW, sf::Color(60,140,220)); y += 17.f;
+    drawStatBar(window, "Morale", (float)player.getMorale(), (float)Player::MAX_MORALE, {px+8.f,y}, barW, sf::Color(160,80,200)); y += 17.f;
 
     auto ammoT = makeText("Ammo: " + std::to_string(inventory.getAmmo()), 12, sf::Color(200,100,100));
     ammoT.setPosition({px + 8.f, y + 2.f});
     window.draw(ammoT);
 }
 
-// ─── Combat overlay ───────────────────────────────────────────────────────────
-
 void HUD::drawCombatOverlay(sf::RenderWindow& window) {
-    if (!world.currentEnemy()) return;
-    Enemy* enemy = world.currentEnemy();
+    if (!world.getActiveEnemy()) return;
+    Enemy* enemy = world.getActiveEnemy();
 
     sf::RectangleShape tint({CENTER_W, 80.f});
     tint.setPosition({INV_W, H - 80.f});
@@ -312,111 +292,78 @@ void HUD::drawCombatOverlay(sf::RenderWindow& window) {
     window.draw(eS);
 }
 
-// ─── Draw item icon (colored SVG-style shape) ─────────────────────────────────
-
 void HUD::drawItemIcon(sf::RenderWindow& window, const std::string& name,
                         sf::Vector2f center, float r, float alpha) {
     uint8_t a = static_cast<uint8_t>(alpha);
 
     if (name == "Food") {
-        // Orange circle (bread/can)
         sf::CircleShape outer(r);
-        outer.setOrigin({r, r});
-        outer.setPosition(center);
-        outer.setFillColor(sf::Color(200, 140, 40, a));
-        window.draw(outer);
+        outer.setOrigin({r, r}); outer.setPosition(center);
+        outer.setFillColor(sf::Color(200, 140, 40, a)); window.draw(outer);
         sf::CircleShape inner(r * 0.5f);
-        inner.setOrigin({r*0.5f, r*0.5f});
-        inner.setPosition(center);
-        inner.setFillColor(sf::Color(240, 190, 80, a));
-        window.draw(inner);
+        inner.setOrigin({r*0.5f, r*0.5f}); inner.setPosition(center);
+        inner.setFillColor(sf::Color(240, 190, 80, a)); window.draw(inner);
         sf::Text t(font, "F", (unsigned)(r * 0.9f));
         t.setFillColor(sf::Color(80, 40, 0, a));
         sf::FloatRect tb = t.getLocalBounds();
         t.setOrigin({tb.size.x/2.f, tb.size.y/2.f});
-        t.setPosition(center + sf::Vector2f(0.f, -2.f));
-        window.draw(t);
+        t.setPosition(center + sf::Vector2f(0.f, -2.f)); window.draw(t);
     }
     else if (name == "Water") {
-        // Blue teardrop-ish (circle)
         sf::CircleShape outer(r);
-        outer.setOrigin({r, r});
-        outer.setPosition(center);
-        outer.setFillColor(sf::Color(40, 120, 210, a));
-        window.draw(outer);
+        outer.setOrigin({r, r}); outer.setPosition(center);
+        outer.setFillColor(sf::Color(40, 120, 210, a)); window.draw(outer);
         sf::CircleShape inner(r * 0.5f);
-        inner.setOrigin({r*0.5f, r*0.5f});
-        inner.setPosition(center);
-        inner.setFillColor(sf::Color(100, 180, 255, a));
-        window.draw(inner);
+        inner.setOrigin({r*0.5f, r*0.5f}); inner.setPosition(center);
+        inner.setFillColor(sf::Color(100, 180, 255, a)); window.draw(inner);
         sf::Text t(font, "W", (unsigned)(r * 0.9f));
         t.setFillColor(sf::Color(0, 40, 100, a));
         sf::FloatRect tb = t.getLocalBounds();
         t.setOrigin({tb.size.x/2.f, tb.size.y/2.f});
-        t.setPosition(center + sf::Vector2f(0.f, -2.f));
-        window.draw(t);
+        t.setPosition(center + sf::Vector2f(0.f, -2.f)); window.draw(t);
     }
     else if (name == "Medicine") {
-        // Green cross shape (two rectangles)
         sf::RectangleShape bg({r*2.f, r*2.f});
-        bg.setOrigin({r, r});
-        bg.setPosition(center);
-        bg.setFillColor(sf::Color(30, 160, 80, a));
-        window.draw(bg);
+        bg.setOrigin({r, r}); bg.setPosition(center);
+        bg.setFillColor(sf::Color(30, 160, 80, a)); window.draw(bg);
         sf::RectangleShape hBar({r*1.6f, r*0.6f});
-        hBar.setOrigin({r*0.8f, r*0.3f});
-        hBar.setPosition(center);
-        hBar.setFillColor(sf::Color(220, 255, 220, a));
-        window.draw(hBar);
+        hBar.setOrigin({r*0.8f, r*0.3f}); hBar.setPosition(center);
+        hBar.setFillColor(sf::Color(220, 255, 220, a)); window.draw(hBar);
         sf::RectangleShape vBar({r*0.6f, r*1.6f});
-        vBar.setOrigin({r*0.3f, r*0.8f});
-        vBar.setPosition(center);
-        vBar.setFillColor(sf::Color(220, 255, 220, a));
-        window.draw(vBar);
+        vBar.setOrigin({r*0.3f, r*0.8f}); vBar.setPosition(center);
+        vBar.setFillColor(sf::Color(220, 255, 220, a)); window.draw(vBar);
     }
     else if (name == "Ammo") {
-        // Dark red bullet-ish shape
         sf::RectangleShape bg({r*1.4f, r*2.f});
-        bg.setOrigin({r*0.7f, r});
-        bg.setPosition(center);
-        bg.setFillColor(sf::Color(160, 50, 50, a));
-        window.draw(bg);
+        bg.setOrigin({r*0.7f, r}); bg.setPosition(center);
+        bg.setFillColor(sf::Color(160, 50, 50, a)); window.draw(bg);
         sf::CircleShape tip(r * 0.7f);
         tip.setOrigin({r*0.7f, r*0.7f});
         tip.setPosition(center + sf::Vector2f(0.f, -r*0.7f));
-        tip.setFillColor(sf::Color(220, 180, 60, a));
-        window.draw(tip);
+        tip.setFillColor(sf::Color(220, 180, 60, a)); window.draw(tip);
         sf::Text t(font, "A", (unsigned)(r * 0.8f));
         t.setFillColor(sf::Color(255, 200, 200, a));
         sf::FloatRect tb = t.getLocalBounds();
         t.setOrigin({tb.size.x/2.f, tb.size.y/2.f});
-        t.setPosition(center + sf::Vector2f(0.f, 4.f));
-        window.draw(t);
+        t.setPosition(center + sf::Vector2f(0.f, 4.f)); window.draw(t);
     }
 }
-
-// ─── Dragged item rendering ───────────────────────────────────────────────────
 
 void HUD::drawDraggedItem(sf::RenderWindow& window) {
     if (!drag.active) return;
     drawItemIcon(window, drag.itemName, drag.pos, 28.f, 200.f);
-
-    // Hint text under icon
     auto hint = makeText("drop on character", 10, sf::Color(180, 180, 180));
     hint.setPosition({drag.pos.x - 45.f, drag.pos.y + 32.f});
     window.draw(hint);
 }
 
-// ─── Input handlers ───────────────────────────────────────────────────────────
-
 void HUD::onMousePressed(sf::Vector2f mp) {
-    // Top bar
     if (restBtn.getGlobalBounds().contains(mp)) {
         world.doRest();
         return;
     }
 
-    if (world.inCombat()) {
+    if (world.isCombatActive()) {
         handleCombatClick(mp);
         return;
     }
@@ -427,7 +374,7 @@ void HUD::onMousePressed(sf::Vector2f mp) {
         return;
     }
 
-    if (world.isChoiceMade() && !world.inCombat()) {
+    if (world.isChoiceMade() && !world.isCombatActive()) {
         sf::FloatRect centerArea({INV_W, TOP_H}, {CENTER_W, CENTER_H});
         if (centerArea.contains(mp)) {
             world.enterNextRoom();
@@ -435,10 +382,8 @@ void HUD::onMousePressed(sf::Vector2f mp) {
         }
     }
 
-    // Start drag from inventory icons
     for (auto& ic : invIcons) {
         if (ic.rect.contains(mp)) {
-            // Check we actually have the item
             bool hasIt = false;
             if      (ic.itemName == "Food")     hasIt = inventory.hasFood();
             else if (ic.itemName == "Water")    hasIt = inventory.hasWater();
@@ -462,22 +407,16 @@ void HUD::onMouseMoved(sf::Vector2f mp) {
 
 void HUD::onMouseReleased(sf::Vector2f mp) {
     if (!drag.active) return;
-
-    // Check drop zones
     for (auto& dz : dropZones) {
         if (dz.rect.contains(mp)) {
             applyDrop(drag.itemName, dz.target);
             break;
         }
     }
-
     drag.active = false;
 }
 
-// ─── Apply a drag-drop give ───────────────────────────────────────────────────
-
 void HUD::applyDrop(const std::string& item, const std::string& target) {
-    // Ammo only goes to player
     if (item == "Ammo" && target != "player") return;
 
     Entity* ent = nullptr;
@@ -492,11 +431,9 @@ void HUD::applyDrop(const std::string& item, const std::string& target) {
     else if (item == "Ammo")     inventory.useAmmo();
 }
 
-// ─── Combat click ─────────────────────────────────────────────────────────────
-
 bool HUD::handleCombatClick(sf::Vector2f mp) {
-    if (!world.inCombat() || !world.currentEnemy()) return false;
-    Enemy* enemy = world.currentEnemy();
+    if (!world.isCombatActive() || !world.getActiveEnemy()) return false;
+    Enemy* enemy = world.getActiveEnemy();
 
     if (attackAmmoBtn.getGlobalBounds().contains(mp)) {
         if (inventory.hasAmmo()) { inventory.removeAmmo(1); enemy->takeDamage(10); }
@@ -514,10 +451,7 @@ bool HUD::handleCombatClick(sf::Vector2f mp) {
     return false;
 }
 
-// ─── Toggles ──────────────────────────────────────────────────────────────────
 void HUD::onScroll(float delta) { (void)delta; }
-
-// ─── Stat bar ─────────────────────────────────────────────────────────────────
 
 void HUD::drawStatBar(sf::RenderWindow& window, const std::string& label,
                        float value, float maxVal, sf::Vector2f pos, float width,
@@ -534,56 +468,84 @@ void HUD::drawStatBar(sf::RenderWindow& window, const std::string& label,
     window.draw(lbl);
 }
 
-// ─── Ending screen ────────────────────────────────────────────────────────────
-
 void HUD::drawEndingScreen(sf::RenderWindow& window) {
     window.clear(sf::Color(4, 4, 8));
 
-    std::string heading, body;
-    sf::Color   headCol;
+    EndingType  et   = world.getEnding();
+    EndingCard  card = getEndingCard(et);
 
-    GameWorld::EndingType ending = world.getEnding();
-
-    if (ending == GameWorld::EndingType::GOOD) {
-        heading = "ENDING I — YOU MADE IT";
-        body    = "You stepped into the light.\n"
-                  "Battered, hungry — but here.\n\n"
-                  "The city above was gone. What came next\n"
-                  "was anyone's guess. But you got out.";
-        headCol = sf::Color(100, 220, 100);
-    } 
-    else if (ending == GameWorld::EndingType::MORALE) {
-        heading = "ENDING II — BROKEN";
-        body    = "You reached the surface. Barely.\n"
-                  "But the weight of every choice had cost something.\n\n"
-                  "Nobody ever found out what happened to them after that.";
-        headCol = sf::Color(150, 100, 200);
-    } 
-    else if (ending == GameWorld::EndingType::DEAD) {
-        heading = "GAME OVER";
-        body    = "The tunnels took you.\n"
-                  "Like they've taken everyone else who came down here.\n\n"
-                  "Nobody made it to the surface.";
-        headCol = sf::Color(200, 40, 40);
-    }
-    else {
-        return;
+    // Title colour by family
+    sf::Color titleCol;
+    switch (et) {
+        case EndingType::ESCAPE_WHOLE:
+            titleCol = sf::Color(100, 220, 120); break;
+        case EndingType::ESCAPE_SCARRED:
+        case EndingType::ESCAPE_HOLLOW:
+            titleCol = sf::Color(220, 200, 100); break;
+        case EndingType::ESCAPE_BROKEN:
+        case EndingType::ESCAPE_LAST_THING:
+            titleCol = sf::Color(200, 140, 80);  break;
+        case EndingType::ESCAPE_ALONE:
+            titleCol = sf::Color(180, 100, 60);  break;
+        case EndingType::DEAD_COLLAPSE:
+        case EndingType::DEAD_GAVE_UP:
+        default:
+            titleCol = sf::Color(200, 40, 40);   break;
     }
 
-    sf::Text h(font, heading, 46); h.setFillColor(headCol); h.setStyle(sf::Text::Bold);
-    sf::FloatRect hb = h.getLocalBounds(); h.setOrigin({hb.size.x/2.f,0.f}); h.setPosition({640.f,190.f});
-    window.draw(h);
+    // Title
+    sf::Text title(font, card.title, 44);
+    title.setStyle(sf::Text::Bold);
+    title.setFillColor(titleCol);
+    {
+        sf::FloatRect b = title.getLocalBounds();
+        title.setOrigin({b.size.x / 2.f, 0.f});
+        title.setPosition({640.f, 160.f});
+    }
+    window.draw(title);
 
-    sf::Text b(font, body, 20); b.setFillColor(sf::Color(200,195,180));
-    sf::FloatRect bb = b.getLocalBounds(); b.setOrigin({bb.size.x/2.f,0.f}); b.setPosition({640.f,310.f});
-    window.draw(b);
+    // Subtitle
+    sf::Text sub(font, card.subtitle, 18);
+    sub.setFillColor(sf::Color(130, 130, 130));
+    {
+        sf::FloatRect b = sub.getLocalBounds();
+        sub.setOrigin({b.size.x / 2.f, 0.f});
+        sub.setPosition({640.f, 220.f});
+    }
+    window.draw(sub);
 
-    sf::Text p(font, "Survival Underground", 14); p.setFillColor(sf::Color(80,80,100));
-    sf::FloatRect pb = p.getLocalBounds(); p.setOrigin({pb.size.x/2.f,0.f}); p.setPosition({640.f,590.f});
-    window.draw(p);
+    // Divider
+    sf::RectangleShape div({400.f, 1.f});
+    div.setFillColor(sf::Color(60, 60, 70));
+    div.setPosition({240.f, 258.f});
+    window.draw(div);
+
+    // Body — one line at a time for clean centering
+    {
+        std::string line;
+        float lineY = 272.f;
+        std::istringstream ss(card.body);
+        while (std::getline(ss, line)) {
+            sf::Text lt(font, line, 19);
+            lt.setFillColor(sf::Color(190, 185, 170));
+            sf::FloatRect b = lt.getLocalBounds();
+            lt.setOrigin({b.size.x / 2.f, 0.f});
+            lt.setPosition({640.f, lineY});
+            window.draw(lt);
+            lineY += 32.f;
+        }
+    }
+
+    // Prompt
+    sf::Text prompt(font, "[ click to play again ]", 15);
+    prompt.setFillColor(sf::Color(90, 90, 90));
+    {
+        sf::FloatRect b = prompt.getLocalBounds();
+        prompt.setOrigin({b.size.x / 2.f, 0.f});
+        prompt.setPosition({640.f, 640.f});
+    }
+    window.draw(prompt);
 }
-
-// ─── makeText ─────────────────────────────────────────────────────────────────
 
 sf::Text HUD::makeText(const std::string& str, unsigned size, sf::Color col) const {
     sf::Text t(font, str, size);

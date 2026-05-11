@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <functional> // so we can store a function inside a struct
+#include <functional>
 
 enum class EventType {
     COMBAT,

@@ -8,7 +8,6 @@
 #include "Mutant.hpp"
 #include <algorithm>
 #include <cstdlib>
-
 GameWorld::GameWorld(Player& player, Partner& partner, Child& child, Inventory& inventory)
     : player(player), partner(partner), child(child), inventory(inventory)
     , currentRoom(-1), eventActive(false), combatActive(false)
@@ -43,6 +42,9 @@ void GameWorld::applyRoomDrain() {
     player.update();
     partner.update();
     child.update();
+ 
+    // Clamp morale to 0 — checkEndings will catch it as DEAD_GAVE_UP
+    if (player.getMorale() < 0) player.setMorale(0);
 }
 
 // Random bad things that just happen — no choice, no warning
@@ -63,25 +65,23 @@ void GameWorld::maybeFireRandomEvent() {
                 + activeEvent.narrative;
         } else if (who == 1) {
             partner.takeDamage(30);
-            partner.reduceFood(20);
+            partner.reduceFood(10);
             activeEvent.narrative =
                 "[Your Partner wakes up sick. There's nothing you can do right now.\n"
                 "They threw up and shivered through the night.\n\n"
-                " They push through it but lose 20 health.]\n\n"
+                " They push through it but lose 30 health.]\n\n"
                 + activeEvent.narrative;
         } else {
             child.takeDamage(30);
-            child.reduceFood(20);
+            child.reduceFood(10);
             activeEvent.narrative =
                 "[Your child is burning up. You hold them until it passes.\n"
                 "They threw up and shivered through the night.\n\n"
-                " It costs them 30 health and costs you 20 food.]\n\n"
+                " It costs them 30 health and costs you 10 food.]\n\n"
                 + activeEvent.narrative;
         }
         return;
     }
-
-    // ~10% chance of a section of ceiling coming down
     else if (roll < 25) {
         int dmg = 10 + rand() % 11; // 10-20
         player.takeDamage(dmg);
@@ -171,15 +171,44 @@ void GameWorld::endCombat() {
 
 
 void GameWorld::checkEndings() {
-    if (!player.isAlive()) { 
-        ending = EndingType::DEAD; 
-        return; 
+    // Morale collapse — psychological death
+    if (player.getMorale() <= 0) {
+        ending = EndingType::DEAD_GAVE_UP;
+        return;
     }
-    if (currentRoom >= TOTAL_ROOMS - 1) {
-        if      (player.getMorale() >= 60) ending = EndingType::GOOD;
-        else if (player.getMorale() >= 25) ending = EndingType::MORALE;
-        else                               ending = EndingType::DEAD;
+ 
+    // Physical death
+    if (!player.isAlive()) {
+        ending = EndingType::DEAD_COLLAPSE;
+        return;
     }
+ 
+    // Only evaluate survival endings once the final room is cleared
+    if (currentRoom < TOTAL_ROOMS - 1) return;
+ 
+    bool partnerAlive = partner.isAlive();
+    bool childAlive   = child.isAlive();
+    int  morale       = player.getMorale();
+ 
+    if (partnerAlive && childAlive) {
+        if      (morale >= 70) ending = EndingType::ESCAPE_WHOLE;
+        else if (morale >= 40) ending = EndingType::ESCAPE_SCARRED;
+        else                   ending = EndingType::ESCAPE_HOLLOW;
+        return;
+    }
+ 
+    if (partnerAlive && !childAlive) {
+        ending = EndingType::ESCAPE_LAST_THING;
+        return;
+    }
+ 
+    if (!partnerAlive && childAlive) {
+        ending = EndingType::ESCAPE_BROKEN;
+        return;
+    }
+ 
+    // Both dead, player alone
+    ending = EndingType::ESCAPE_ALONE;
 }
 
 void GameWorld::loadImage(const std::string& file) const {
