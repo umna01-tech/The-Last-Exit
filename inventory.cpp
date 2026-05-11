@@ -1,5 +1,4 @@
 #include "Inventory.hpp"
-#include <algorithm>
 #include <iostream>
 
 Inventory::Inventory()
