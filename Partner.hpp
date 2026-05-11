@@ -1,6 +1,6 @@
 #pragma once
 #include "FamilyMember.hpp"
- 
+class Child;
 class Partner : public FamilyMember {
 private:
     int healCooldown;
