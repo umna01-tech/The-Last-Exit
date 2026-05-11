@@ -279,7 +279,7 @@ int main() {
                 ph.setOutlineThickness(2.f);
                 window.draw(ph);
             }
-            drawCentered("BREAKING NEWS — A bomb has detonated somewhere in the city.", 22, sf::Color(255,60,60),   540.f, true);
+            drawCentered("BREAKING NEWS! A bomb has detonated somewhere in the city.", 22, sf::Color(255,60,60),   540.f, true);
             drawCentered("Evacuation has collapsed. Panic. Fires. No signal.",           18, sf::Color(220,220,220), 575.f);
             drawCentered("You grab what you can and go underground.",                    18, sf::Color(255,200,50),  608.f);
             drawCentered("[ click to continue ]",                                        15, sf::Color(120,120,120), 680.f);
