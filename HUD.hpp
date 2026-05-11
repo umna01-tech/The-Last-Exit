@@ -47,7 +47,7 @@ private:
 
     struct DropZone {
         sf::FloatRect rect;
-        std::string   target;   // "player" | "partner" | "child"
+        std::string   target;  
     };
     mutable std::vector<DropZone> dropZones;
 

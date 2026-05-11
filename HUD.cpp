@@ -71,11 +71,11 @@ void HUD::drawInventoryPanel(sf::RenderWindow& window) {
     window.draw(bg);
 
     auto title = makeText("INVENTORY", 20, sf::Color(150, 150, 200));
-    title.setPosition({8.f, TOP_H + 6.f});
+    title.setPosition({8.f, TOP_H - 15.f});
     window.draw(title);
 
     auto hint = makeText("drag to give", 10, sf::Color(80, 80, 110));
-    hint.setPosition({100.f, TOP_H + 8.f});
+    hint.setPosition({100.f, TOP_H + 10.f});
     window.draw(hint);
 
     sf::RectangleShape div({INV_W - 4.f, 1.f});
@@ -129,12 +129,12 @@ void HUD::drawInventoryPanel(sf::RenderWindow& window) {
         iy += 76.f;
     }
 
-    bool canRest = (inventory.getFood() >= 9 && inventory.getWater() >= 9);
+    bool canRest = (inventory.getFood() >= 5 && inventory.getWater() >= 5);
     restBtn.setFillColor(canRest ? sf::Color(22, 48, 22) : sf::Color(22, 28, 22));
     restBtn.setOutlineColor(canRest ? sf::Color(50, 130, 50) : sf::Color(40, 55, 40));
     window.draw(restBtn);
 
-    auto restL = makeText(canRest ? "REST (9 food + 9 water)" : "REST (need 9 food+water)",
+    auto restL = makeText(canRest ? "REST (5 food + 5 water)" : "REST (need 5 food+water)",
                           11, canRest ? sf::Color(100, 220, 100) : sf::Color(80, 100, 80));
     restL.setPosition({12.f, H - 37.f});
     window.draw(restL);
@@ -436,14 +436,14 @@ bool HUD::handleCombatClick(sf::Vector2f mp) {
     Enemy* enemy = world.getActiveEnemy();
 
     if (attackAmmoBtn.getGlobalBounds().contains(mp)) {
-        if (inventory.hasAmmo()) { inventory.removeAmmo(1); enemy->takeDamage(10); }
-        else                     { enemy->takeDamage(5); player.takeDamage(2); }
+        if (inventory.hasAmmo()) { inventory.removeAmmo(1); enemy->takeDamage(25); }
+        else                     { enemy->takeDamage(10); player.takeDamage(2); }
         if (!enemy->isDead()) enemy->attack(player);
         else                  world.endCombat();
         return true;
     }
     if (attackHandBtn.getGlobalBounds().contains(mp)) {
-        enemy->takeDamage(5); player.takeDamage(2);
+        enemy->takeDamage(10); player.takeDamage(2);
         if (!enemy->isDead()) enemy->attack(player);
         else                  world.endCombat();
         return true;
