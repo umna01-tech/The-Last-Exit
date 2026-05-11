@@ -28,7 +28,7 @@ void Inventory::useFood(Entity& entity)
         return;
     }
     food -= 1;
-    entity.addFood(5);
+    entity.addFood(15);
 }
 
 void Inventory::removeFood(int amount)
@@ -53,7 +53,7 @@ void Inventory::useWater(Entity& entity)
         return;
     }
     water -= 1;
-    entity.addWater(5);
+    entity.addWater(20);
 }
 
 void Inventory::removeWater(int amount)
@@ -72,7 +72,7 @@ void Inventory::useMedicine(Entity &entity)
         return;
     }
     medicine -= 1;
-    entity.heal(15);
+    entity.heal(30);
 }
 void Inventory::removeMedicine(int amount){
     medicine -= amount;
