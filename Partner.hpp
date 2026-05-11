@@ -4,9 +4,10 @@
 class Partner : public FamilyMember {
 private:
     int healCooldown;
+    Child& child;
  
 public:
-    Partner(const std::string& name_, const std::string& role_, Player& player_);
+    Partner(const std::string& name_, const std::string& role_, Player& player_, Child& child_);
     ~Partner();
  
     void healPlayer();
