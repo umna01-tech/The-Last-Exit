@@ -47,7 +47,7 @@ void GameWorld::applyRoomDrain() {
     if (player.getMorale() < 0) player.setMorale(0);
 }
 
-// Random bad things that just happen — no choice, no warning
+// Random bad things that just happen
 void GameWorld::maybeFireRandomEvent() {
     int roll = rand() % 100;
 
@@ -59,9 +59,11 @@ void GameWorld::maybeFireRandomEvent() {
             player.reduceMorale(10);
             // prepend a notice to the narrative
             activeEvent.narrative =
-                "[You wake up feverish. It must be something you ate, or just the air down here.\n"
-                "You cursed everyone and everything as you dragged yourself out of bed."
-                " You lose 30 health and 10 morale before you can even move.]\n\n"
+                "[You wake up feverish and barely able to stand. Your body aches,\n"
+                "your head pounds, and even breathing feels difficult.\n"
+                "Maybe it was the food, maybe the air down here. \n"
+                "Maybe it was the food, maybe the air down here. \n"
+                "You drag yourself forward anyway, losing 30 health and 10 morale before the day even begins.]\n\n"
                 + activeEvent.narrative;
         } else if (who == 1) {
             partner.takeDamage(30);
@@ -320,7 +322,7 @@ void GameWorld::drawEventScreen(sf::RenderWindow& window, const sf::Font& font,
         banner.setOutlineThickness(1.f);
         window.draw(banner);
         sf::Text ct(font, "!! COMBAT !!  " + activeEnemy->getStatus()
-                        + "  — SHOOT or PUNCH to fight", 13);
+                        + "  SHOOT or PUNCH to fight", 13);
         ct.setFillColor(sf::Color(255,100,100));
         ct.setPosition({x + 8.f, y - 32.f});
         window.draw(ct);
@@ -392,9 +394,9 @@ void GameWorld::giveToStranger(int food, int water, int moraleReward, int ammoRe
 }
 
 void GameWorld::tryRest() {
-    if (inventory.getFood() >= 9 && inventory.getWater() >= 9) {
-        inventory.removeFood(9);
-        inventory.removeWater(9);
+    if (inventory.getFood() >= 5 && inventory.getWater() >= 5) {
+        inventory.removeFood(5);
+        inventory.removeWater(5);
         player.heal(15); partner.heal(15); child.heal(15);
         player.addMorale(15);
         activeEvent.narrative += "\n\n[Everyone sleeps. First real rest in a while.]";
@@ -408,7 +410,7 @@ void GameWorld::buildEasyPool() {
 
     // 1. Storage find
     easyPool.push_back({ EventType::RESOURCE, "Storage Closet", "assets/images/locations/storage.png",
-        "You push open a rusted door. Shelves of old canned goods.\n"
+        "You push open a rusted door. There are shelves of old canned goods.\n"
         "Most are expired. Some are sealed. Hard to tell which is which.\n"
         "Your family eyes them without saying anything.",
         {
@@ -541,7 +543,7 @@ void GameWorld::buildEasyPool() {
                     inventory.addWater(water);
                     player.takeDamage(12);
                     player.reduceMorale(8);
-                    activeEvent.narrative += "\n\n[Looked clean. Wasn't.\n"
+                    activeEvent.narrative += "\n\n[Looked clean But Wasn't.\n"
                                               + std::to_string(water)
                                               + " water but 12 damage. Bad trade.]";
                 } else if (roll < 65) {
@@ -555,7 +557,7 @@ void GameWorld::buildEasyPool() {
                     inventory.addWater(water);
                     inventory.addFood(2);
                     player.addMorale(5);
-                    activeEvent.narrative += "\n\n[More than expected. +"
+                    activeEvent.narrative += "\n\n[You got More than expected."
                         + std::to_string(water) + " water, +2 food on a shelf above the waterline.]";
                 }
             }},
@@ -582,7 +584,7 @@ void GameWorld::buildEasyPool() {
                 } else if (roll < 70) {
                     inventory.removeMedicine(1);
                     player.addMorale(20);
-                    child.heal(5);
+                    child.heal(15);
                     activeEvent.narrative += "\n\n[The cat calms down. Your companion holds it\n"
                                               "before setting it down gently.]";
                 } else {
@@ -599,7 +601,7 @@ void GameWorld::buildEasyPool() {
                 if (roll < 40) {
                     player.reduceMorale(20);
                     child.takeDamage(8);
-                    activeEvent.narrative += "\n\n[Your family stops walking for a full minute.\n"
+                    activeEvent.narrative += "\n\n[Your family stops talking for a full hour.\n"
                                               "You don't speak for a long time after.]";
                 } else if (roll < 80) {
                     player.reduceMorale(12);
@@ -619,8 +621,8 @@ void GameWorld::buildEasyPool() {
 
     easyPool.push_back({ EventType::RESOURCE, "Comms Room", "assets/images/locations/saferoom.png",
         "A speaker crackles to life. Someone is broadcasting.\n"
-        "'Survivors at sector 7. Supplies at the east hub.'\n"
-        "Could be real. Could be a trap to draw people out.",
+        "'Attention Survivors at sector 7. Supplies at the east hub.'\n"
+        "This Could be real Or Could be a trap to draw people out.",
         {
             { "Follow the signal", [this]{
                 int roll = rand() % 100;
@@ -726,7 +728,8 @@ void GameWorld::buildEasyPool() {
                     player.reduceMorale(5);
                     player.takeDamage(5);
                     activeEvent.narrative += "\n\n[No time. You tell yourself that.\n"
-                                              "Everyone looks exhausted. Including you.]";
+                                              "Everyone looks exhausted. Including you.\n"
+                                              "They might secretly hate you for it.]";
                 } else {
                     // someone collapses
                     int dmg = 10 + rand() % 10;
@@ -743,7 +746,7 @@ void GameWorld::buildEasyPool() {
     // 6. Toolbox ammo
     easyPool.push_back({ EventType::RESOURCE, "Tool Room", "assets/images/locations/storage.png",
         "A locked box. Your companion finds a crowbar and pops it.\n"
-        "Ammunition — neatly stacked, still sealed.\n"
+        "Ammunition neatly stacked, still sealed.\n"
         "Someone was prepared. They're not here now.",
         {
             { "Take the ammo and go", [this]{
@@ -944,7 +947,7 @@ void GameWorld::buildEasyPool() {
                 } else if (roll < 75) {
                     giveToStranger(2, 0, 10);
                     activeEvent.narrative += "\n\n[They take it without argument.\n"
-                                              "Go the other direction.]";
+                                              "And Go the other direction.]";
                 } else {
                     // they leave something behind
                     giveToStranger(2, 0, 12);
@@ -970,7 +973,7 @@ void GameWorld::buildEasyPool() {
                     // they were actually dangerous — good call
                     player.addMorale(8);
                     activeEvent.narrative += "\n\n[You hear them try another group further down.\n"
-                                              "Screaming shortly after.\n"
+                                              "Screaming followed shortly after.\n"
                                               "Good call.]";
                 }
             }},
@@ -1036,7 +1039,7 @@ void GameWorld::buildMedPool() {
                     inventory.removeFood(5);
                     player.addMorale(5);
                     inventory.addAmmo(1);
-                    activeEvent.narrative += "\n\n['Mutant three rooms ahead. Left side.'\n"
+                    activeEvent.narrative += "\n\n['Mutant three rooms ahead. Left side.', he said.\n"
                         "He pockets the food and walks.\n"
                         "-5 food, +1 ammo.]";
                 }
@@ -1058,7 +1061,7 @@ void GameWorld::buildMedPool() {
                     player.addMorale(8);
                     activeEvent.narrative += "\n\n[Clean escape.\n"
                         "You hear him shouting at the thing you threw.\n"
-                        "Already gone.]";
+                        "You are Already gone.]";
                 }
             }},
         }
@@ -1169,7 +1172,7 @@ void GameWorld::buildMedPool() {
     medPool.push_back({ EventType::MORAL, "Crossroads", "assets/images/locations/crossroads.png",
         "Three people block the tunnel. A man, a woman, and a child.\n"
         "All hollow-eyed. The child is barely standing.\n"
-        "'Please. She hasn't eaten in two days.'",
+        "'Please. We haven't eaten in two days.'",
         {
             { "Share generously", [this]{
                 int roll = rand() % 100;
@@ -1196,10 +1199,10 @@ void GameWorld::buildMedPool() {
                 } else {
                     inventory.removeFood(5);
                     inventory.removeWater(3);
-                    inventory.addMedicine(1);
+                    inventory.addMedicine(2);
                     player.addMorale(32);
                     activeEvent.narrative += "\n\n[The woman presses a small kit into your hand.\n"
-                        "'We found it. We can't use it.' +1 medicine.]";
+                        "'We found it. We can't use it.' 2 medicine.]";
                 }
             }},
             { "Give a little", [this]{
@@ -1297,7 +1300,7 @@ void GameWorld::buildMedPool() {
                 } else {
                     partner.takeDamage(3);
                     player.addMorale(5);
-                    activeEvent.narrative += "\n\n['I've had worse.'\n"
+                    activeEvent.narrative += "\n\n['I've had worse.' they say\n"
                         "Maybe they have. Only 3 damage.]";
                 }
             }},
@@ -1403,7 +1406,7 @@ void GameWorld::buildMedPool() {
                     player.takeDamage(5);
                     inventory.addAmmo(3);
                     player.addMorale(12);
-                    activeEvent.narrative += "\n\n[Surprised them. 5 damage each.\n"
+                    activeEvent.narrative += "\n\n[You Surprised them. 5 damage each.\n"
                         "+3 ammo off the bodies.]";
                 }
             }},
@@ -1462,7 +1465,7 @@ void GameWorld::buildMedPool() {
     // 7. Generator room stranger
     medPool.push_back({ EventType::ENCOUNTER, "Generator Room", "assets/images/locations/shelter.png",
         "A working generator hums. Actual light.\n"
-        "In the corner — a person. Wounded. Can't walk on their own.\n"
+        "In the corner there is a person. Wounded. Can't walk on their own.\n"
         "'I heard the generator. I thought maybe someone was still here.'",
         {
             { "Help them and take the kit", [this]{
@@ -1538,7 +1541,7 @@ void GameWorld::buildMedPool() {
             { "Open fire immediately", [this]{
                 int roll = rand() % 100;
                 if (roll < 20) {
-                    int dmg = 18 + rand() % 12;
+                    int dmg = 10 + rand() % 12;
                     player.takeDamage(dmg);
                     triggerCombat(80, 14, false);
                     activeEvent.narrative += "\n\n[First shot missed. It reached you.\n"
@@ -1583,7 +1586,7 @@ void GameWorld::buildMedPool() {
                         "Saved time. -3 food.]";
                 }
             }},
-            { "Hold still — 50/50", [this]{
+            { "Hold still (50/50)", [this]{
                 int roll = rand() % 100;
                 if (roll < 50) {
                     triggerCombat(80, 14, false);
@@ -1598,7 +1601,7 @@ void GameWorld::buildMedPool() {
                     player.addMorale(15);
                     inventory.addAmmo(2);
                     activeEvent.narrative += "\n\n[It moved on. Dropped something.\n"
-                        "Ammo — human ammo.\n"
+                        "Ammo - human ammo.\n"
                         "From someone it already found. +2 ammo.]";
                 }
             }},
@@ -1612,7 +1615,7 @@ void GameWorld::buildHardPool() {
     // 1. Large mutant
     hardPool.push_back({ EventType::COMBAT, "Abandoned Metro", "assets/images/locations/station.png",
         "Total silence.\n"
-        "Then a sound — low, wet, wrong.\n"
+        "Then a sound, low, wet, wrong.\n"
         "Something massive drops from the ceiling. Too many limbs.\n"
         "It hasn't seen you yet. That won't last.",
         {
@@ -1775,7 +1778,7 @@ void GameWorld::buildHardPool() {
                         "-3 ammo spent. +6 ammo found.]";
                 }
             }},
-            { "Run — drop all food", [this]{
+            { "Run and drop all food", [this]{
                 int roll = rand() % 100;
                 int f = inventory.getFood();
                 inventory.removeFood(f);
@@ -2002,7 +2005,7 @@ void GameWorld::buildHardPool() {
         "'I'm fine. I'm fine.'\n"
         "They are not fine.",
         {
-            { "Use 2 medicine — treat it properly", [this]{
+            { "Use 2 medicine to treat it properly", [this]{
                 int roll = rand() % 100;
                 if (inventory.getMedicine() >= 2) {
                     if (roll < 20) {
@@ -2078,10 +2081,10 @@ void GameWorld::buildHardPool() {
     // 6. Ambush — net trap
     hardPool.push_back({ EventType::COMBAT, "Ambush Point", "assets/images/locations/corridor.png",
         "They were waiting. Three of them.\n"
-        "A net drops from above — your companion is tangled.\n"
+        "A net drops from above and your companion is tangled.\n"
         "You have exactly one second.",
         {
-            { "Fight — protect them", [this]{
+            { "Fight to protect them", [this]{
                 int roll = rand() % 100;
                 if (roll < 25) {
                     // badly outnumbered
@@ -2109,7 +2112,7 @@ void GameWorld::buildHardPool() {
                         "+3 ammo.]";
                 }
             }},
-            { "Throw everything — food and water", [this]{
+            { "Throw everything , food and water", [this]{
                 int roll = rand() % 100;
                 int food  = std::min(8, inventory.getFood());
                 int water = std::min(8, inventory.getWater());
@@ -2149,7 +2152,7 @@ void GameWorld::buildHardPool() {
 
     // 7. Lone child
     hardPool.push_back({ EventType::MORAL, "Final Stretch", "assets/images/locations/exit.png",
-        "A child — alone, no older than yours — sits in the tunnel.\n"
+        "A child - alone, no older than yourssits in the tunnel.\n"
         "No adults in sight. Been here a while.\n"
         "They look at you without saying anything.\n"
         "Your companion is already looking at you.",
@@ -2241,7 +2244,7 @@ void GameWorld::buildHardPool() {
 
     // 8. Stranger offering a deal
     hardPool.push_back({ EventType::ENCOUNTER, "Reactor Annex", "assets/images/locations/shelter.png",
-        "Someone steps out of the dark. Armed — but hands low.\n"
+        "Someone steps out of the dark. Armed but hands low.\n"
         "'I know the way to the surface. Shortest route.\n"
         " No mutants. No looters. I've walked it twice.\n"
         " I need your medicine. All of it.'",
