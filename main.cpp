@@ -174,8 +174,6 @@ int main() {
                     if (m->button == sf::Mouse::Button::Left) {
                         sf::Vector2f mp = window.mapPixelToCoords(
                             sf::Mouse::getPosition(window));
-                        // HUD handles all clicks — combat, choices, and
-                        // the forward button — internally
                         session->hud->onMousePressed(mp);
                     }
                 }
