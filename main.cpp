@@ -3,7 +3,7 @@
 #include "Store.hpp"
 #include "Player.hpp"
 #include "Partner.hpp"
-#include "Child.hpp"
+#include "Child.hpp" 
 #include "GameWorld.hpp"
 #include "Endings.hpp"
 #include "HUD.hpp"
@@ -25,9 +25,9 @@ enum class GameState {
 enum class Difficulty { EASY, MEDIUM, HARD };
 
 static void applyDifficulty(Difficulty diff, Inventory& inv) {
-    if      (diff == Difficulty::EASY)   inv.setMoney(1000);
-    else if (diff == Difficulty::MEDIUM) inv.setMoney(500);
-    else                                 inv.setMoney(250);
+    if      (diff == Difficulty::EASY)   inv.setMoney(2500);
+    else if (diff == Difficulty::MEDIUM) inv.setMoney(1500);
+    else  inv.setMoney(750);
 }
 
 struct GameSession {
