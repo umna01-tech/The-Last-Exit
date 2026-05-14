@@ -109,7 +109,6 @@ int main() {
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
 
-        // ══════════════════════════════════════════ EVENTS ════════════════════
         while (const std::optional ev = window.pollEvent()) {
 
             if (ev->is<sf::Event::Closed>()) { window.close(); continue; }

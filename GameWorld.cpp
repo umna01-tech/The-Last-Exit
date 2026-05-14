@@ -27,11 +27,11 @@ RoomTier GameWorld::tierForRoom(int room) const {
 RoomEvent GameWorld::pickEvent(RoomTier tier) {
     std::vector<RoomEvent>* pool = nullptr;
     switch (tier) {
-        case RoomTier::EASY:   pool = &easyPool;  
+        case RoomTier::EASY:pool = &easyPool;  
             break;
-        case RoomTier::MEDIUM: pool = &medPool;   
+        case RoomTier::MEDIUM:pool = &medPool;   
             break;
-        case RoomTier::HARD:   pool = &hardPool;    
+        case RoomTier::HARD:pool = &hardPool;    
             break;
     }
     //go to the actual vector, pick a random slot, return whatever event is there

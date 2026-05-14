@@ -14,7 +14,7 @@ enum class EventType {
 
 struct Choice {
     std::string text;              // words the player sees on the button
-    std::function<void()> action; // without you cant store lambda in the struct
+    std::function<void()> action; 
 };
 
 struct RoomEvent {
